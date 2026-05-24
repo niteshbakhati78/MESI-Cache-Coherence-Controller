@@ -1,6 +1,5 @@
 # artix7.xdc — Timing constraints for Xilinx Artix-7 (xc7a35t)
 # Target: 50 MHz clock (20 ns period)
-# Use these constraints for synthesis and implementation in Vivado.
 
 # ── Primary clock ─────────────────────────────────────────────────────────
 # Constrain the top-level clock port of coherence_system.
@@ -25,18 +24,3 @@ set_false_path -from [get_ports rst_n]
 set_clock_uncertainty -setup 0.200 [get_clocks clk]
 set_clock_uncertainty -hold  0.100 [get_clocks clk]
 
-# ── Target device / package ───────────────────────────────────────────────
-# Artix-7 35T — CPG236 package (used on Basys3/Arty boards)
-# Uncomment if targeting a board with a specific part:
-# set_property PART xc7a35tcpg236-1 [current_project]
-
-# ── Notes ─────────────────────────────────────────────────────────────────
-# If synthesis fails timing at 100 MHz:
-#   - Try 12 ns (83 MHz): change -period to 12.000
-#   - Try 15 ns (67 MHz): change -period to 15.000
-# A clean passing report at a lower frequency is preferable to a failing
-# report at 100 MHz for a resume/portfolio project.
-#
-# After implementation, read WNS from:
-#   Reports → Timing Summary → Setup → Worst Negative Slack
-# Achieved Fmax = 1000 / (clock_period_ns - WNS_ns)  [in MHz]

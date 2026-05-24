@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe docs/generate_diagrams.py)"
+    ]
+  }
+}

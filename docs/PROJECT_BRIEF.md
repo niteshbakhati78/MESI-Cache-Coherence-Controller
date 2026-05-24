@@ -6,7 +6,7 @@
 # MESI Cache Coherence Controller
 ### SystemVerilog | Vivado Synthesis | SVA Assertions | Python Verification
 
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 ![Language](https://img.shields.io/badge/RTL-SystemVerilog-blueviolet)
 ![Tool](https://img.shields.io/badge/Tool-Xilinx%20Vivado-orange)
 ![Verification](https://img.shields.io/badge/Verification-SVA%20%2B%20Python-blue)
@@ -24,32 +24,7 @@ The project is motivated by real-world GPU and SoC design practice at companies 
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        CPU Core 0                           │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │              L1 Cache Controller 0                   │    │
-│  │   ┌──────────┐  ┌───────────┐  ┌────────────────┐  │    │
-│  │   │ MESI FSM │  │ Cache RAM │  │  LRU Replacer  │  │    │
-│  │   │(per line)│  │(Data+Tag) │  │   (N-way)      │  │    │
-│  │   └──────────┘  └───────────┘  └────────────────┘  │    │
-│  └──────────────────────────────────────────────────────┘   │
-│                            │                                 │
-└────────────────────────────┼─────────────────────────────────┘
-                             │ Bus Request / Snoop
-┌─────────────────────────────────────────────────────────────┐
-│                     Bus Arbiter                              │
-│         (Round-robin · Priority · Snoop coordination)        │
-└──────────────┬──────────────────────────────┬───────────────┘
-               │                              │
-┌──────────────┴──────────┐    ┌──────────────┴──────────┐
-│   L1 Cache Controller 1  │    │     Shared L2 Cache      │
-│   ┌──────────┐           │    │  ┌──────────────────┐    │
-│   │ MESI FSM │           │    │  │  Write-back SRAM  │    │
-│   │(per line)│           │    │  │  Inclusive Policy │    │
-│   └──────────┘           │    │  └──────────────────┘    │
-└──────────────────────────┘    └─────────────────────────-┘
-```
+![Architecture Diagram](diagrams/architecture.png)
 
 ---
 
@@ -66,31 +41,7 @@ Each cache line independently tracks one of four states:
 
 ### State Transition Diagram
 
-```
-                        ┌─────────────────────────────────────┐
-                        │           INVALID (I)                │
-                        └──────┬──────────────────────────────┘
-                               │
-              Processor Read   │                Processor Read
-           (no other sharer)   │             (other sharer exists)
-                               ▼
-        ┌──────────────────────────────────────────────┐
-        │              EXCLUSIVE (E)                    │──────────────────┐
-        └──────────────────────────────────────────────┘                  │
-               │                      │                              BusRead
-        Proc   │ Write          Snoop │ BusRead                     from other
-        Write  │                      │                              cache
-               ▼                      ▼
-        ┌────────────┐         ┌────────────┐
-        │ MODIFIED   │         │  SHARED    │
-        │    (M)     │◄────────│    (S)     │
-        └────────────┘ BusUpgr └────────────┘
-               │               (Proc Write)
-        Snoop  │ BusRead
-               ▼
-        Write-back to L2
-        → SHARED or INVALID
-```
+![MESI State Machine](diagrams/mesi_fsm.png)
 
 ### Bus Transaction Types
 
@@ -301,16 +252,14 @@ Generates performance analysis plots:
 
 | Metric | Value |
 |--------|-------|
-| Target Device | Xilinx Artix-7 (xc7a35t) |
-| Clock Frequency Target | 100 MHz |
-| Achieved Fmax | TBD — post synthesis |
-| LUT Utilization | TBD |
-| FF Utilization | TBD |
-| BRAM Utilization | TBD |
-| Timing Slack (Setup) | TBD |
-| Critical Path | TBD |
-
-> Synthesis report and timing closure report available in `/synth/` after run.
+| Target Device | Xilinx Artix-7 xc7a35tcpg236-1 |
+| Clock Period | 20 ns (50 MHz) |
+| Achieved Fmax | **~50.4 MHz** (WNS = +0.155 ns) |
+| LUT Utilization | 26,691 / 63,400 (42%) |
+| FF Utilization | 11,261 / 126,800 (9%) |
+| BRAM Utilization | 2 / 50 (1%) |
+| Setup violations | 0 |
+| Hold violations | 0 |
 
 ---
 
@@ -408,16 +357,16 @@ vivado -mode batch -source scripts/run_synth.tcl
 
 - [x] MESI state machine design (paper + FSM diagram)
 - [x] Single L1 cache controller RTL skeleton
-- [ ] Single L1 simulation passing hit/miss tests
-- [ ] Two-cache snooping protocol integration
-- [ ] Bus arbiter implementation
-- [ ] Shared L2 integration
-- [ ] Full system coherence simulation
-- [ ] SVA assertions for all protocol properties
-- [ ] Vivado synthesis + timing closure
-- [ ] Python testbench + golden model
-- [ ] Performance visualization
-- [ ] README updated with actual results
+- [x] Single L1 simulation passing hit/miss tests
+- [x] Two-cache snooping protocol integration
+- [x] Bus arbiter implementation
+- [x] Shared L2 integration
+- [x] Full system coherence simulation (13/13 tests passing)
+- [x] SVA assertions for all protocol properties
+- [x] Vivado synthesis + timing closure (50.4 MHz, 0 violations)
+- [x] Python testbench + golden model
+- [x] Performance visualization
+- [x] README updated with actual results
 
 ---
 

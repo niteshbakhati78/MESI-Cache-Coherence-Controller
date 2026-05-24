@@ -1,7 +1,4 @@
 // Shared inclusive L2 cache (reference skeleton).
-//
-// For interview/readme completeness this is a synthesizable SRAM-style model,
-// but not wired into a full system here.
 `timescale 1ns/1ps
 
 module l2_cache #(
