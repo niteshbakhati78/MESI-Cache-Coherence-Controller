@@ -265,18 +265,18 @@ Generates performance analysis plots:
 
 ## Performance Metrics
 
-> **Note:** Populated after simulation runs. Tracked in `verif/results/results.md`.
+> Results from Python golden model (`verif/run_experiments.py`). Latencies from model parameters: `l1_hit_cycles=1`, `bus_cycles=4`, `l2_cycles=12`.
 
 | Metric | Value |
 |--------|-------|
-| L1 Read Hit Latency | TBD cycles |
-| L1 Write Hit Latency | TBD cycles |
-| L2 Read Latency (miss) | TBD cycles |
-| BusRead Transaction Time | TBD cycles |
-| BusReadX Transaction Time | TBD cycles |
-| Coherence Overhead (false sharing) | TBD % vs no sharing |
-| L1 Hit Rate (producer-consumer) | TBD % |
-| Bus Utilization (peak) | TBD % |
+| L1 Read Hit Latency | 1 cycle |
+| L1 Write Hit Latency | 1 cycle (Modified / Exclusive — no bus transaction) |
+| L2 Read Latency (miss) | 16 cycles (4 bus + 12 L2 fill) |
+| BusRead Transaction Time | 16 cycles |
+| BusReadX Transaction Time | 16 cycles |
+| Coherence Overhead (false sharing) | 0% L1 hit rate (vs 99.2% in private workload) |
+| L1 Hit Rate (producer-consumer) | 98.4% Core 0 / 0% Core 1 (all reads invalidated by producer) |
+| Bus Utilization (peak) | 39.6% (producer-consumer workload) |
 
 ---
 
@@ -353,32 +353,3 @@ vivado -mode batch -source scripts/run_synth.tcl
 
 ---
 
-## Roadmap
-
-- [x] MESI state machine design (paper + FSM diagram)
-- [x] Single L1 cache controller RTL skeleton
-- [x] Single L1 simulation passing hit/miss tests
-- [x] Two-cache snooping protocol integration
-- [x] Bus arbiter implementation
-- [x] Shared L2 integration
-- [x] Full system coherence simulation (13/13 tests passing)
-- [x] SVA assertions for all protocol properties
-- [x] Vivado synthesis + timing closure (50.4 MHz, 0 violations)
-- [x] Python testbench + golden model
-- [x] Performance visualization
-- [x] README updated with actual results
-
----
-
-## About
-
-Built as a standalone interview preparation project targeting NVIDIA GPU Architecture Engineer and ASIC Design Engineer roles. All design decisions are made with silicon readiness, testability, and interview defensibility in mind.
-
-**Author:** Nitesh Bakhati  
-**Contact:** niteshbakhati1@gmail.com  
-**LinkedIn:** linkedin.com/in/nitesh-bakhati1997  
-**Timeline:** May–June 2025
-
----
-
-> *"The goal isn't just a working simulation — it's a design you can defend line by line in a technical interview."*
