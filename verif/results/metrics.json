@@ -1,0 +1,38 @@
+[
+  {
+    "name": "private",
+    "total_cycles": 4480,
+    "bus_utilization": 0.02857142857142857,
+    "l1_hit_rate_core0": 0.992,
+    "l1_hit_rate_core1": 0.992,
+    "bus_counts": {
+      "BUS_RD": 0,
+      "BUS_RDX": 32,
+      "BUS_UPGR": 0
+    }
+  },
+  {
+    "name": "producer_consumer",
+    "total_cycles": 40384,
+    "bus_utilization": 0.39619651347068147,
+    "l1_hit_rate_core0": 0.984,
+    "l1_hit_rate_core1": 0.0,
+    "bus_counts": {
+      "BUS_RD": 2000,
+      "BUS_RDX": 32,
+      "BUS_UPGR": 1968
+    }
+  },
+  {
+    "name": "false_sharing",
+    "total_cycles": 64000,
+    "bus_utilization": 0.25,
+    "l1_hit_rate_core0": 0.0,
+    "l1_hit_rate_core1": 0.0,
+    "bus_counts": {
+      "BUS_RD": 0,
+      "BUS_RDX": 4000,
+      "BUS_UPGR": 0
+    }
+  }
+]

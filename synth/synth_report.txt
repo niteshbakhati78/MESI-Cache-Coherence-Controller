@@ -1,0 +1,7 @@
+Synthesis Report (placeholder)
+==============================
+
+This file is intended to contain Vivado `report_utilization` output.
+
+Status: TBD (run `vivado -mode batch -source scripts/run_synth.tcl` once RTL is implemented)
+
