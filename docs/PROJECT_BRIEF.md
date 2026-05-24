@@ -280,43 +280,6 @@ Generates performance analysis plots:
 
 ---
 
-## Key Design Decisions
-
-### Why Snooping Over Directory?
-Snooping protocol is appropriate for 2-core configurations — broadcast overhead is acceptable at this scale. Directory protocol would be the right choice at 8+ cores. This mirrors the design decision GPU architects make when balancing coherence traffic vs. scalability.
-
-### Why Inclusive L2?
-Inclusive policy simplifies coherence — L2 is always a superset of all L1 lines, so L2 can authoritatively handle snoop requests without querying L1 controllers. Trade-off: L2 capacity is partially wasted holding L1 duplicates.
-
-### Why Pseudo-LRU Over True LRU?
-True LRU requires O(N log N) state bits per set. Pseudo-LRU (tree-based) achieves comparable replacement quality with O(N-1) bits — the standard industry choice for VLSI implementation.
-
-### Reset Strategy
-Synchronous active-low reset. All MESI states initialize to Invalid on reset. Reset topology verified to avoid metastability across clock domains.
-
-### CDC Strategy
-Interrupt signals crossing from cache clock domain to CPU clock domain use a 2-FF synchronizer. AXI handshake channels are kept within a single clock domain. No combinatorial paths cross clock boundaries.
-
----
-
-## Connection to NVIDIA Interview Topics
-
-This project directly demonstrates competency in topics commonly tested in NVIDIA hardware interviews:
-
-| Interview Topic | Where Demonstrated in This Project |
-|----------------|-------------------------------------|
-| Cache coherence protocols | Full MESI FSM implementation and validation |
-| RTL design and synthesis | Synthesizable SystemVerilog targeting Artix-7 |
-| Timing closure | Vivado synthesis + timing report on real FPGA |
-| SVA / Formal verification | Concurrent assertions for protocol correctness |
-| CDC and reset strategy | CDC synchronizer + verified reset topology |
-| Memory hierarchy design | L1/L2 hierarchy with write-back policy |
-| Bus arbitration | Round-robin arbiter with snoop coordination |
-| Performance modeling | Python pipeline: hit rate, latency, bus utilization |
-| Functional coverage | Covergroups for all MESI transition combinations |
-| HW/SW co-design thinking | Memory-mapped PMU counters for host visibility |
-
----
 
 ## Build & Simulation Instructions
 
