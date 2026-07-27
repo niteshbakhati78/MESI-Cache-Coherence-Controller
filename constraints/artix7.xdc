@@ -23,4 +23,3 @@ set_false_path -from [get_ports rst_n]
 # Model 200 ps jitter (typical for Artix-7 MMCM output).
 set_clock_uncertainty -setup 0.200 [get_clocks clk]
 set_clock_uncertainty -hold  0.100 [get_clocks clk]
-
