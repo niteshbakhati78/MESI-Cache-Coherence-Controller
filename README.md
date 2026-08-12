@@ -41,6 +41,13 @@ verif/                      Python golden model and experiments
   run_tests.py              Unit + randomized stress tests
   run_experiments.py        Generates results.md, metrics.json, and plots
   results/                  Pre-generated results and plots
+
+uvm_tb/                     UVM testbench targeting mesi_fsm.sv
+  mesi_if.sv                SV interface with drv_cb / mon_cb clocking blocks
+  mesi_uvm_pkg.sv           All UVM classes: seq_item, driver, monitor, scoreboard,
+                            agent, env, sequences (random + directed), tests
+  tb_top.sv                 Top module: DUT wiring, config_db, run_test()
+  run.f                     Compile filelist with Questa / Xcelium usage comments
 ```
 
 ---
@@ -95,6 +102,43 @@ python verif/run_experiments.py
 ![BUS_RDX count by workload](verif/results/plots/bus_rdx.png)
 
 The false-sharing workload shows 0% L1 hit rate because every access to the shared line is invalidated by the other core — a classic coherence penalty that the protocol correctly captures.
+
+---
+
+## UVM Testbench (mesi_fsm)
+
+A UVM testbench targets the standalone `mesi_fsm.sv` module and exercises all canonical MESI state transitions.
+
+**Component hierarchy:**
+```
+mesi_random_test / mesi_directed_test
+  └── mesi_env
+        ├── mesi_agent
+        │     ├── uvm_sequencer
+        │     ├── mesi_driver    (drives inputs via clocking block)
+        │     └── mesi_monitor   (samples outputs, writes to analysis port)
+        └── mesi_scoreboard      (cycle-accurate reference model + checker)
+```
+
+The scoreboard mirrors `mesi_fsm`'s `always_comb` block exactly. Each cycle it verifies `state_q`, `bus_req`, `bus_op`, and `wb_en` against the predicted values and reports pass/fail counts at the end of the run.
+
+Two tests are provided:
+- **`mesi_directed_test`** — 10 directed transactions covering every arc on the MESI state diagram
+- **`mesi_random_test`** — 200 constrained-random transactions
+
+**Questa:**
+```bash
+vlog -sv -f uvm_tb/run.f
+vsim -c tb_top +UVM_TESTNAME=mesi_directed_test -do "run -all; quit -f"
+vsim -c tb_top +UVM_TESTNAME=mesi_random_test   -do "run -all; quit -f"
+```
+
+**Xcelium:**
+```bash
+xrun -sv -uvm -f uvm_tb/run.f -top tb_top +UVM_TESTNAME=mesi_directed_test
+```
+
+**EDA Playground (free):** Select Riviera-PRO, enable UVM, upload the 5 files (`rtl/mesi_fsm.sv` + all 4 in `uvm_tb/`), set top to `tb_top`, and add `+UVM_TESTNAME=mesi_directed_test` to the run arguments.
 
 ---
 
